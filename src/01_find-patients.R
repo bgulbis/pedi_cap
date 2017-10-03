@@ -16,18 +16,19 @@ dir_raw <- "data/raw"
 pts <- read_data(dir_raw, "patients", FALSE) %>%
     as.patients() %>%
     filter(age < 18,
-           discharge.datetime <= mdy("9/30/2017", tzone = "US/Central"))
+           visit.type == "Inpatient",
+           discharge.datetime < mdy("10/1/2017", tz = "US/Central"))
 
 mbo_id <- concat_encounters(pts$millennium.id)
 
 # run MBO query
 #   * Location History
 
-locations <- read_data(dir_raw, "locations", FALSE) %>%
+locations <- read_data(dir_raw, "location", FALSE) %>%
     as.locations() %>%
     tidy_data()
 
-icu <- c("Neonatal", "Pediatric Intensive Care")
+icu <- c("HC NICE", "HC NICW", "HC PICU")
 
 excl_icu <- locations %>%
     filter(location %in% icu) %>%
@@ -42,9 +43,44 @@ mbo_id <- concat_encounters(include$millennium.id)
 #       - Clinical Event: Invasive Ventilation Mode;Non-Invasive Ventilation Mode;nitric oxide;ECMO
 #   * Diagnosis - ICD-9/10-CM
 
-# * Patients requiring ventilatory support including mechanical ventilation,
-# continuous positive airway pressure therapy, bilevel positive airway pressure
-# therapy, extracorporeal membrane oxygenation therapy or nitric oxide therapy
-# during hospital course
-# * Patients with pneumonitis due to inhalation of food and/or vomitus (J69.0)
+# exclude if ICD code J69.0
+diagnosis <- read_data(dir_raw, "diagnosis", FALSE) %>%
+    as.diagnosis()
 
+excl_icd <- diagnosis %>%
+    filter(diag.code == "J69.0") %>%
+    distinct(millennium.id)
+
+include <- anti_join(include, excl_icd, by = "millennium.id")
+
+# exclude if vent, cpap, bipap, ecmo, or nitric
+excl_vent <- read_data(dir_raw, "vent", FALSE) %>%
+    as.events() %>%
+    distinct(millennium.id)
+
+include <- anti_join(include, excl_vent, by = "millennium.id")
+
+write_rds(include, "data/tidy/include_pts.Rds", "gz")
+
+mbo_id <- concat_encounters(include$millennium.id)
+
+abx <- med_lookup("anti-infectives")
+
+mbo_abx <- concat_encounters(abx$med.name)
+
+# run MBO queries:
+#   * Clinical Events - Prompt
+#       - Clinical Event: SpO2 percent;Respiratory Rate
+#   * Demographics
+#   * Labs - Prompt
+#       - Lab: Creatinine Lvl; WBC; Sed Rate, CRP, C-Reactive Protein, Procalcitonin Lvl
+#   * Measures
+#   * Medications - Inpatient - Prompt
+#       - Medication: in mbo_abx
+#   * Medications - Home and Discharge
+#       - Order Type: Prescription/Discharge Order
+#   * Orders
+#       - Mnemonic (Primary Generic) FILTER ON: CDM PEDI Pneumonia CAP > 60 days Admission
+
+# run EDW query:
+#   * Identifiers - by Millennium Encounter Id
