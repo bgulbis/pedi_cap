@@ -1,5 +1,6 @@
 library(tidyverse)
 library(lubridate)
+library(stringr)
 library(edwr)
 
 dir_raw <- "data/raw"
@@ -64,10 +65,10 @@ write_rds(include, "data/tidy/include_pts.Rds", "gz")
 
 mbo_id <- concat_encounters(include$millennium.id)
 
-abx <- med_lookup("anti-infectives")
+abx <- med_lookup("anti-infectives") %>%
+    mutate_at("med.name", str_to_lower)
 
 mbo_abx <- concat_encounters(abx$med.name)
-
 # run MBO queries:
 #   * Clinical Events - Prompt
 #       - Clinical Event: SpO2 percent;Respiratory Rate
