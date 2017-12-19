@@ -17,7 +17,7 @@ pts <- read_data(dir_raw, "patients", FALSE) %>%
     as.patients() %>%
     filter(age < 18,
            visit.type == "Inpatient",
-           discharge.datetime < mdy("10/1/2017", tz = "US/Central"))
+           discharge.datetime >= mdy("11/15/2017", tz = "US/Central"))
 
 mbo_id <- concat_encounters(pts$millennium.id)
 
@@ -60,7 +60,7 @@ excl_vent <- read_data(dir_raw, "vent", FALSE) %>%
 
 include <- anti_join(include, excl_vent, by = "millennium.id")
 
-write_rds(include, "data/tidy/include_pts.Rds", "gz")
+write_rds(include, "data/tidy/include_pts_pilot.Rds", "gz")
 
 mbo_id <- concat_encounters(include$millennium.id)
 
