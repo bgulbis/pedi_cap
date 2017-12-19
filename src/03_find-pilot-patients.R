@@ -73,6 +73,7 @@ mbo_id <- concat_encounters(include$millennium.id)
 #   * Clinical Events - Prompt
 #       - Clinical Event: SpO2 percent;Respiratory Rate
 #   * Demographics
+#   * Identifiers - by Millennium Encounter Id
 #   * Labs - Prompt
 #       - Lab: Creatinine Lvl; WBC; Sed Rate, CRP, C-Reactive Protein, Procalcitonin Lvl
 #   * Measures
@@ -81,6 +82,3 @@ mbo_id <- concat_encounters(include$millennium.id)
 #       - Order Type: Prescription/Discharge Order
 #   * Orders
 #       - Mnemonic (Primary Generic) FILTER ON: CDM PEDI Pneumonia CAP > 60 days Admission
-
-# run EDW query:
-#   * Identifiers - by Millennium Encounter Id
