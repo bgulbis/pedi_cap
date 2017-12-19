@@ -3,7 +3,7 @@ library(lubridate)
 library(stringr)
 library(edwr)
 
-dir_raw <- "data/raw"
+dir_raw <- "data/raw/baseline"
 
 # run MBO query
 #   * Patients - by ICD
@@ -65,10 +65,11 @@ write_rds(include, "data/tidy/include_pts.Rds", "gz")
 
 mbo_id <- concat_encounters(include$millennium.id)
 
-abx <- med_lookup("anti-infectives") %>%
-    mutate_at("med.name", str_to_lower)
+# abx <- med_lookup("anti-infectives") %>%
+#     mutate_at("med.name", str_to_lower)
+#
+# mbo_abx <- concat_encounters(abx$med.name)
 
-mbo_abx <- concat_encounters(abx$med.name)
 # run MBO queries:
 #   * Clinical Events - Prompt
 #       - Clinical Event: SpO2 percent;Respiratory Rate
@@ -76,8 +77,7 @@ mbo_abx <- concat_encounters(abx$med.name)
 #   * Labs - Prompt
 #       - Lab: Creatinine Lvl; WBC; Sed Rate, CRP, C-Reactive Protein, Procalcitonin Lvl
 #   * Measures
-#   * Medications - Inpatient - Prompt
-#       - Medication: in mbo_abx
+#   * Medications - Inpatient - All
 #   * Medications - Home and Discharge
 #       - Order Type: Prescription/Discharge Order
 #   * Orders
