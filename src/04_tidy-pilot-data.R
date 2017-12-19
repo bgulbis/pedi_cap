@@ -3,7 +3,7 @@ library(edwr)
 
 dir_raw <- "data/raw/pilot1"
 
-id <- read_data(dir_raw, "identifiers") %>%
+id <- read_data(dir_raw, "identifiers", FALSE) %>%
     as.id()
 
 # patients ---------------------------------------------
@@ -44,7 +44,7 @@ orders <- read_data(dir_raw, "orders", FALSE) %>%
     distinct()
 
 data_patients <- demographics %>%
-    left_join(id[c("millennium.id", "fin")], by = "millennium.id") %>%
+    left_join(id, by = "millennium.id") %>%
     left_join(height, by = "millennium.id") %>%
     left_join(weight, by = "millennium.id") %>%
     left_join(labs, by = "millennium.id") %>%
