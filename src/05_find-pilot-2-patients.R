@@ -60,7 +60,7 @@ excl_vent <- read_data(dir_raw, "vent", FALSE) %>%
 
 include <- anti_join(include, excl_vent, by = "millennium.id")
 
-write_rds(include, "data/tidy/include_pts_pilot.Rds", "gz")
+write_rds(include, "data/tidy/include_pts_pilot2.Rds", "gz")
 
 mbo_id <- concat_encounters(include$millennium.id)
 
@@ -76,7 +76,7 @@ mbo_id <- concat_encounters(include$millennium.id)
 #   * Identifiers - by Millennium Encounter Id
 #   * Labs - Prompt
 #       - Lab: Creatinine Lvl; WBC; Sed Rate, CRP, C-Reactive Protein, Procalcitonin Lvl
-#   * Measures
+#   * Clinical Events - Measures
 #   * Medications - Inpatient - All
 #   * Medications - Home and Discharge
 #       - Order Type: Prescription/Discharge Order
