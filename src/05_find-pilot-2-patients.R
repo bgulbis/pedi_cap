@@ -1,6 +1,7 @@
 library(tidyverse)
 library(lubridate)
 library(edwr)
+library(icd)
 
 dir_raw <- "data/raw/pilot2"
 
@@ -45,7 +46,8 @@ mbo_id <- concat_encounters(include$millennium.id)
 
 # exclude if ICD code J69.0
 diagnosis <- read_data(dir_raw, "diagnosis", FALSE) %>%
-    as.diagnosis()
+    as.diagnosis() %>%
+    tidy_data()
 
 excl_icd <- diagnosis %>%
     filter(diag.code == "J69.0") %>%
